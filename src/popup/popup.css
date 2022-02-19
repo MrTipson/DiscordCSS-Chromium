@@ -14,12 +14,12 @@ body{
 	width: 400px;
 	font-size: 11pt;
 }
-#stylesheets{
+.stylesheets{
 	padding: 2px;
 }
-#groups{
+.groups{
 	margin-left: 30px;
 }
-#properties{
+.properties{
 	margin-left: 30px;
 }

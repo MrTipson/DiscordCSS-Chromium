@@ -32,15 +32,15 @@ async function getSheets(){
 
 function createStylesheetNode(sheet, disabledisable){
 	let clon = s_template.content.cloneNode(true);
-	clon.getElementById("stylesheetName").innerText = sheet.name;
-	let cb = clon.getElementById("stylesheetEnabled");
+	clon.querySelector(".stylesheetName").innerText = sheet.name;
+	let cb = clon.querySelector(".stylesheetEnabled");
 	cb.dataset.name = sheet.name;
 	if(disabledisable){
 		cb.parentElement.removeChild(cb);
 	} else{
 		cb.checked = !sheet.disabled;
 	}
-	let grup = clon.getElementById("groups");
+	let grup = clon.querySelector(".groups");
 	for(i in sheet.groups){
 		grup.appendChild(createGroupNode(sheet.groups[i]));
 	}
@@ -48,8 +48,8 @@ function createStylesheetNode(sheet, disabledisable){
 }
 function createGroupNode(group){
 	let clon = g_template.content.cloneNode(true);
-	clon.getElementById("groupName").innerText = group.name;
-	let prop = clon.getElementById("properties");
+	clon.querySelector(".groupName").innerText = group.name;
+	let prop = clon.querySelector(".properties");
 	for(i in group.properties){
 		prop.appendChild(createPropertyNode(group.properties[i]));
 	}
@@ -57,6 +57,6 @@ function createGroupNode(group){
 }
 function createPropertyNode(property){
 	let clon = p_template.content.cloneNode(true);
-	clon.getElementById("propertyName").innerText = property.name;
+	clon.querySelector(".propertyName").innerText = property.name;
 	return clon;
 }
