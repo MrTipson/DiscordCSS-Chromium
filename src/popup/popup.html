@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="popup.css">
+	</head>
+	<body>
+		<button id="refresh">Refresh</button>
+		<div id="stylesheets"></div>
+	</body>
+	<template id="stylesheetTemplate">
+		<div class="stylesheet">
+			<details>
+				<summary>
+					<span id="stylesheetName"></span>
+					<input id="stylesheetEnabled" type="checkbox">
+				</summary>
+				<div id="groups"></div>
+			</details>
+		</div>
+	</template>
+	<template id="groupTemplate">
+		<div class="group">
+			<div id="groupName"></div>
+			<div id="properties"></div>
+		</div>
+	</template>
+	<template id="propertyTemplate">
+		<div class="property">
+			<label id="propertyName"/>
+			<input id="text"/>
+		</div>
+	</template>
+	<script src="popup.js"></script>
+</html>
