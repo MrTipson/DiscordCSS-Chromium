@@ -5,18 +5,22 @@ const p_template = document.getElementById("propertyTemplate");
 const g_template = document.getElementById("groupTemplate");
 document.getElementById("refresh").addEventListener("click", getSheets);
 
+document.getElementById("popout").addEventListener("click", ()=>{
+	chrome.windows.create({
+		url: 'src/popup/popup.html',
+		type: "popup"
+	});
+	window.close();
+});
+
 stylesheets.addEventListener("change", async function(event){
-	let [activeTab] = await chrome.tabs.query({active: true, currentWindow: true});
-	chrome.tabs.sendMessage(activeTab.id, {kind: "set", element: {kind: event.target.type, name: event.target.dataset.name}, value: event.target.checked});
-	let obj = {};
-	obj[event.target.dataset.name] = event.target.checked;
+	chrome.runtime.sendMessage({kind: "set", element: {kind: event.target.type, name: event.target.dataset.name}, value: event.target.checked});
 });
 
 getSheets();
 
 async function getSheets(){
-	let [activeTab] = await chrome.tabs.query({active: true, currentWindow: true});
-	chrome.tabs.sendMessage(activeTab.id, {kind: "get"}, (response)=>{
+	chrome.runtime.sendMessage({kind: "get"}, (response)=>{
 		if(!response){
 			stylesheets.innerText = "Error";
 		}else{

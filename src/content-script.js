@@ -1,14 +1,14 @@
 let style_used;
 
 chrome.runtime.onMessage.addListener(
-	async function(request, sender, sendResponse) {
+	function(request, sender, sendResponse) {
 		let temp = document.getElementById("discordcss-wrapper");
 		if(!temp){
 			sendResponse(false);
 			return true;
 		}
 		if(request.kind == "get"){
-			//console.log("Request received");
+			console.log("Request received");
 			sendResponse(parseDocumentCSS());
 		}else if(request.kind == "set"){
 			if(request.element.kind == "checkbox"){
@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener(
 				sheet.disabled = !request.value;
 				let obj = {}
 				obj[request.element.name] = !request.value;
-				await chrome.storage.sync.set(obj);
+				chrome.storage.sync.set(obj);
 			} else if(request.element.kind == "text"){
 				document.getElementById("discordcss-custom-style").innerText = request.value;
 			}
@@ -25,7 +25,6 @@ chrome.runtime.onMessage.addListener(
 		return true;
 	}
 );
-console.log("[DiscordCSS] Injected");
 fetchStylesheets(async function(sheets){
 	let temp = document.createElement("div");
 	temp.id = "discordcss-wrapper";
@@ -52,6 +51,7 @@ fetchStylesheets(async function(sheets){
 	temp.appendChild(style);
 	document.head.appendChild(temp);
 });
+console.log("[DiscordCSS] Injected");
 /* Adapted from https://css-tricks.com/how-to-get-all-custom-properties-on-a-page-in-javascript/ */
 function parseDocumentCSS(){
 	//console.log([...document.styleSheets]);
