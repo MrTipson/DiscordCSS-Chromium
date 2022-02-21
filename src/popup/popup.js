@@ -49,8 +49,14 @@ function createStylesheetNode(sheet, disabledisable){
 	}
 	let grup = clon.querySelector(".groups");
 	if(sheet.groups?.length){
+		let single = false;
+		if(sheet.groups.length == 1){
+			single = true;
+		}
+		console.log(sheet.name);
+		console.log(single);
 		for(i in sheet.groups){
-			grup.appendChild(createGroupNode(sheet.groups[i]));
+			grup.appendChild(createGroupNode(sheet.groups[i], single));
 		}
 	} else{
 		let notice = document.createElement("span");
@@ -60,8 +66,9 @@ function createStylesheetNode(sheet, disabledisable){
 	}
 	return clon;
 }
-function createGroupNode(group){
+function createGroupNode(group, isOpen){
 	let clon = g_template.content.cloneNode(true);
+	clon.querySelector(".group").open = isOpen;
 	clon.querySelector(".groupName").innerText = group.name;
 	let prop = clon.querySelector(".properties");
 	for(i in group.properties){

@@ -9,21 +9,19 @@
 		<div id="stylesheets"></div>
 	</body>
 	<template id="stylesheetTemplate">
-		<div class="stylesheet">
-			<details>
-				<summary>
-					<span class="stylesheetName"></span>
-					<input class="stylesheetEnabled" type="checkbox">
-				</summary>
-				<div class="groups"></div>
-			</details>
-		</div>
+		<details class="stylesheet">
+			<summary>
+				<span class="stylesheetName"></span>
+				<input class="stylesheetEnabled" type="checkbox">
+			</summary>
+			<div class="groups"></div>
+		</details>
 	</template>
 	<template id="groupTemplate">
-		<div class="group">
-			<div class="groupName"></div>
+		<details class="group">
+			<summary class="groupName"></summary>
 			<div class="properties"></div>
-		</div>
+		</details>
 	</template>
 	<template id="propertyTemplate">
 		<div class="property">

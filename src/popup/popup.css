@@ -8,16 +8,17 @@
 	--text-normal: white;
 	--text-muted: lightgray;
 	--modifier-dark: rgba(0, 0, 0, 0.5);
+	--modifier-light: rgba(255, 255, 255, 0.25);
 }
 html, body{
 	height: auto;
 	width: auto;
 }
 body{
-	min-width: 250px;
+	min-width: 350px;
 	background-color: var(--background-primary);
 	color: var(--text-normal);
-	font-size: 11pt;
+	font-size: 12pt;
 }
 body::-webkit-scrollbar{
 	height: 5px;
@@ -36,12 +37,17 @@ body::-webkit-scrollbar-corner{
 .groups{
 	margin-left: 20px;
 }
+.groupName{
+	color: var(--text-muted);
+	font-size: 0.8rem;
+}
 .properties{
 	margin-left: 20px;
 }
 .property{
 	display: flex;
 	justify-content: space-between;
+	margin-top: 2px;
 }
 .nopropertyNotice{
 	color: var(--text-muted);
@@ -49,9 +55,14 @@ body::-webkit-scrollbar-corner{
 .propertyName{
 	flex-shrink: 0;
 	margin: 0 5px;
+	font-size: 0.8rem;
 }
 .propertyInput{
 	outline: none;
 	flex-shrink: 2;
 	width: 70%;
+	color: var(--text-normal);
+	background-color: var(--modifier-light);
+	border: none;
+	border-bottom: solid 1px white;
 }
