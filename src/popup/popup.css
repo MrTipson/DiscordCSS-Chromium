@@ -3,23 +3,55 @@
 *::after{
 	box-sizing: border-box;
 }
-html{
+:root{
 	--background-primary: #36393F;
 	--text-normal: white;
+	--text-muted: lightgray;
 	--modifier-dark: rgba(0, 0, 0, 0.5);
 }
+html, body{
+	height: auto;
+	width: auto;
+}
 body{
+	min-width: 250px;
 	background-color: var(--background-primary);
 	color: var(--text-normal);
-	width: 400px;
 	font-size: 11pt;
+}
+body::-webkit-scrollbar{
+	height: 5px;
+	width: 5px;
+}
+body::-webkit-scrollbar-thumb{
+	background: white;
+	border-radius: 8px;
+}
+body::-webkit-scrollbar-corner{
+	display: none;
 }
 .stylesheets{
 	padding: 2px;
 }
 .groups{
-	margin-left: 30px;
+	margin-left: 20px;
 }
 .properties{
-	margin-left: 30px;
+	margin-left: 20px;
+}
+.property{
+	display: flex;
+	justify-content: space-between;
+}
+.nopropertyNotice{
+	color: var(--text-muted);
+}
+.propertyName{
+	flex-shrink: 0;
+	margin: 0 5px;
+}
+.propertyInput{
+	outline: none;
+	flex-shrink: 2;
+	width: 70%;
 }

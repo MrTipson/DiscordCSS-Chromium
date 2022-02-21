@@ -8,7 +8,9 @@ document.getElementById("refresh").addEventListener("click", getSheets);
 document.getElementById("popout").addEventListener("click", ()=>{
 	chrome.windows.create({
 		url: 'src/popup/popup.html',
-		type: "popup"
+		type: "popup",
+		width: 500,
+		height: 350
 	});
 	window.close();
 });
@@ -25,7 +27,8 @@ async function getSheets(){
 			stylesheets.innerText = "Error";
 		}else{
 			stylesheets.innerHTML = "";
-			console.log(response);
+			//console.log(response);
+			response.sort((x, y)=>x.name.localeCompare(y.name));
 			for(let i in response){
 				let sheet = response[i];
 				stylesheets.appendChild(createStylesheetNode(sheet, i == 0));
@@ -45,8 +48,15 @@ function createStylesheetNode(sheet, disabledisable){
 		cb.checked = !sheet.disabled;
 	}
 	let grup = clon.querySelector(".groups");
-	for(i in sheet.groups){
-		grup.appendChild(createGroupNode(sheet.groups[i]));
+	if(sheet.groups?.length){
+		for(i in sheet.groups){
+			grup.appendChild(createGroupNode(sheet.groups[i]));
+		}
+	} else{
+		let notice = document.createElement("span");
+		notice.innerText = "No properties in sheet";
+		notice.classList.add("nopropertyNotice");
+		grup.appendChild(notice);
 	}
 	return clon;
 }
