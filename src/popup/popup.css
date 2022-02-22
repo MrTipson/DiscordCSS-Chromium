@@ -1,9 +1,9 @@
 *,
 *::before,
-*::after{
+*::after {
 	box-sizing: border-box;
 }
-:root{
+:root {
 	--background-primary: #36393F;
 	--text-normal: white;
 	--text-muted: lightgray;
@@ -14,50 +14,75 @@ html, body{
 	height: auto;
 	width: auto;
 }
-body{
+body {
 	min-width: 350px;
 	background-color: var(--background-primary);
 	color: var(--text-normal);
 	font-size: 12pt;
 }
-body::-webkit-scrollbar{
+body::-webkit-scrollbar {
 	height: 5px;
 	width: 5px;
 }
-body::-webkit-scrollbar-thumb{
+body::-webkit-scrollbar-thumb {
 	background: white;
 	border-radius: 8px;
 }
-body::-webkit-scrollbar-corner{
+body::-webkit-scrollbar-corner {
 	display: none;
 }
-.stylesheets{
+.stylesheets {
 	padding: 2px;
+}
+.stylesheet > summary {
+	display: flex;
+	align-items: center;
+}
+.stylesheetEnabled {
+	vertical-align: middle;
+}
+summary::marker {
+	content: "";
+}
+details > summary::before {
+	content: "";
+	width: 7px;
+	height: 7px;
+	margin-right: 5px;
+	display: inline-block;
+	border-bottom: 2px solid currentColor;
+	border-right: 2px solid currentColor;
+	transform: rotate(-45deg);
+	transition: transform 0.2s linear;
+}
+details[open] > summary::before {
+	transform: rotate(45deg)
 }
 .groups{
 	margin-left: 20px;
 }
-.groupName{
+.groupName {
 	color: var(--text-muted);
 	font-size: 0.8rem;
 }
-.properties{
+.properties {
 	margin-left: 20px;
 }
-.property{
+.property {
 	display: flex;
 	justify-content: space-between;
 	margin-top: 2px;
 }
-.nopropertyNotice{
+.nopropertyNotice {
 	color: var(--text-muted);
+	font-size: 0.8em;
 }
-.propertyName{
+.propertyName {
 	flex-shrink: 0;
 	margin: 0 5px;
 	font-size: 0.8rem;
 }
-.propertyInput{
+.propertyInput {
 	outline: none;
 	flex-shrink: 2;
 	width: 70%;

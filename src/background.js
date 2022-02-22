@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener(
 		//console.log("Passing on message");
 		//console.log(request);
 		chrome.tabs.query({active: true, url: "https://discord.com/*"}, function([activeTab]){
-			console.log(activeTab);
+			//console.log(activeTab);
 			chrome.tabs.sendMessage(activeTab.id, request, function(response){
 				//console.log("Received response");
 				//console.log(response);

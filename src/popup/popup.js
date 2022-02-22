@@ -53,8 +53,8 @@ function createStylesheetNode(sheet, disabledisable){
 		if(sheet.groups.length == 1){
 			single = true;
 		}
-		console.log(sheet.name);
-		console.log(single);
+		//console.log(sheet.name);
+		//console.log(single);
 		for(i in sheet.groups){
 			grup.appendChild(createGroupNode(sheet.groups[i], single));
 		}
