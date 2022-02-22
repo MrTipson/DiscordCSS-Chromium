@@ -15,8 +15,35 @@ document.getElementById("popout").addEventListener("click", ()=>{
 	window.close();
 });
 
+let changes = null;
 stylesheets.addEventListener("change", async function(event){
-	chrome.runtime.sendMessage({kind: "set", element: {kind: event.target.type, name: event.target.dataset.name}, value: event.target.checked});
+	if(event.target.type == "checkbox") {
+		chrome.runtime.sendMessage({kind: "set", element: {kind: "checkbox", name: event.target.dataset.name}, value: event.target.checked});
+	} else if(event.target.type == "text") {
+		let group = event.path[3].querySelector(".groupName").innerText;
+		let propertyName = event.path[1].querySelector(".propertyName").innerText;
+		let value = event.target.value;
+		if(!changes[group] && value != "") {
+			changes[group] = [];
+		}
+		if(value == "") {
+			delete changes[group][propertyName];
+			if(!changes[group].length) {
+				delete changes[group];
+			}
+		} else {
+			changes[group][propertyName] = value;
+		}
+		let tostring = "";
+		for(let grp in changes) {
+			tostring += `${grp} {`;
+			for(let prop in changes[grp]) {
+				tostring += `${prop}: ${changes[grp][prop]};`;
+			}
+			tostring += `}`;
+		}
+		chrome.runtime.sendMessage({kind: "set", element: {kind: "text", name: null}, value: tostring});
+	}
 });
 
 getSheets();
@@ -31,18 +58,18 @@ async function getSheets(){
 			response.sort((x, y)=>x.name.localeCompare(y.name));
 			for(let i in response){
 				let sheet = response[i];
-				stylesheets.appendChild(createStylesheetNode(sheet, i == 0));
+				stylesheets.appendChild(createStylesheetNode(sheet));
 			}
 		}
 	});
 }
 
-function createStylesheetNode(sheet, disabledisable){
+function createStylesheetNode(sheet){
 	let clon = s_template.content.cloneNode(true);
 	clon.querySelector(".stylesheetName").innerText = sheet.name;
 	let cb = clon.querySelector(".stylesheetEnabled");
 	cb.dataset.name = sheet.name;
-	if(disabledisable){
+	if(sheet.name == "_discord.css"){
 		cb.parentElement.removeChild(cb);
 	} else{
 		cb.checked = !sheet.disabled;

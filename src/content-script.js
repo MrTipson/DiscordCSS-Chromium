@@ -15,10 +15,10 @@ chrome.runtime.onMessage.addListener(
 				let sheet = temp.querySelector(`[data-name="${request.element.name}"]`);
 				sheet.disabled = !request.value;
 				let obj = {}
-				obj[request.element.name] = !request.value;
+				obj[request.element.name] = request.value;
 				chrome.storage.sync.set(obj);
 			} else if(request.element.kind == "text"){
-				document.getElementById("discordcss-custom-style").innerText = request.value;
+				document.getElementById("discordcss-custom-style").innerHTML = request.value;
 			}
 			sendResponse(true);
 		}
@@ -38,16 +38,12 @@ fetchStylesheets(async function(sheets){
 			sheet.dataset.name = name;
 			sheet.innerHTML = response;
 			temp.appendChild(sheet);
-			if(settings && Object.keys(settings).includes(name)){
-				sheet.disabled = settings[name];
-			}
+			sheet.disabled = !(settings && settings[name]);
 		});
 	}
 	let style = document.createElement("style");
 	style.id = "discordcss-custom-style";
-	if(settings && Object.keys(settings).includes(name)){
-		style.innerHTML = settings.style;
-	}
+	style.innerHTML = settings?.style || "";
 	temp.appendChild(style);
 	document.head.appendChild(temp);
 });
@@ -58,7 +54,7 @@ function parseDocumentCSS(){
 	return [...document.styleSheets]
 		.map((stylesheet)=>{
 			return {
-				name: stylesheet.href?.split("/")?.pop() || stylesheet.ownerNode.dataset.name,
+				name: (stylesheet.href && "_discord.css") || stylesheet.ownerNode.dataset.name,
 				disabled: stylesheet.disabled,
 				groups: [...stylesheet.cssRules]
 					.filter((rule) => rule.type === 1)
