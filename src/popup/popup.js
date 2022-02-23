@@ -23,26 +23,7 @@ stylesheets.addEventListener("change", async function(event){
 		let group = event.path[3].querySelector(".groupName").innerText;
 		let propertyName = event.path[1].querySelector(".propertyName").innerText;
 		let value = event.target.value;
-		if(!changes[group] && value != "") {
-			changes[group] = [];
-		}
-		if(value == "") {
-			delete changes[group][propertyName];
-			if(!changes[group].length) {
-				delete changes[group];
-			}
-		} else {
-			changes[group][propertyName] = value;
-		}
-		let tostring = "";
-		for(let grp in changes) {
-			tostring += `${grp} {`;
-			for(let prop in changes[grp]) {
-				tostring += `${prop}: ${changes[grp][prop]};`;
-			}
-			tostring += `}`;
-		}
-		chrome.runtime.sendMessage({kind: "set", element: {kind: "text", name: null}, value: tostring});
+		chrome.runtime.sendMessage({kind: "set", element: {kind: "text", name: null}, value: {group: group, propertyName: propertyName, value: value}});
 	}
 });
 
@@ -54,17 +35,19 @@ async function getSheets(){
 			stylesheets.innerText = "Error";
 		}else{
 			stylesheets.innerHTML = "";
+			let sheets = response.sheets;
+			let style = response.style;
 			//console.log(response);
-			response.sort((x, y)=>x.name.localeCompare(y.name));
-			for(let i in response){
-				let sheet = response[i];
-				stylesheets.appendChild(createStylesheetNode(sheet));
+			sheets.sort((x, y)=>x.name.localeCompare(y.name));
+			for(let i in sheets){
+				let sheet = sheets[i];
+				stylesheets.appendChild(createStylesheetNode(sheet, style));
 			}
 		}
 	});
 }
 
-function createStylesheetNode(sheet){
+function createStylesheetNode(sheet, style){
 	let clon = s_template.content.cloneNode(true);
 	clon.querySelector(".stylesheetName").innerText = sheet.name;
 	let cb = clon.querySelector(".stylesheetEnabled");
@@ -83,7 +66,7 @@ function createStylesheetNode(sheet){
 		//console.log(sheet.name);
 		//console.log(single);
 		for(i in sheet.groups){
-			grup.appendChild(createGroupNode(sheet.groups[i], single));
+			grup.appendChild(createGroupNode(sheet.groups[i], style, single));
 		}
 	} else{
 		let notice = document.createElement("span");
@@ -93,18 +76,21 @@ function createStylesheetNode(sheet){
 	}
 	return clon;
 }
-function createGroupNode(group, isOpen){
+function createGroupNode(group, style, isOpen){
 	let clon = g_template.content.cloneNode(true);
 	clon.querySelector(".group").open = isOpen;
 	clon.querySelector(".groupName").innerText = group.name;
 	let prop = clon.querySelector(".properties");
 	for(i in group.properties){
-		prop.appendChild(createPropertyNode(group.properties[i]));
+		prop.appendChild(createPropertyNode(group.properties[i], style ? style[group.name] : null));
 	}
 	return clon;
 }
-function createPropertyNode(property){
+function createPropertyNode(property, groupStyle){
 	let clon = p_template.content.cloneNode(true);
 	clon.querySelector(".propertyName").innerText = property.name;
+	if(groupStyle && groupStyle[property.name]) {
+		clon.querySelector(".propertyInput").value = groupStyle[property.name];
+	}
 	return clon;
 }
