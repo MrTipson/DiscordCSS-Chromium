@@ -1,11 +1,11 @@
-// Initialize button with user's preferred color
+// commonly used elements
 const stylesheets = document.getElementById("stylesheets");
 const s_template = document.getElementById("stylesheetTemplate");
 const p_template = document.getElementById("propertyTemplate");
 const g_template = document.getElementById("groupTemplate");
 document.getElementById("refresh").addEventListener("click", getSheets);
 
-document.getElementById("popout").addEventListener("click", ()=>{
+document.getElementById("popout").addEventListener("click", () => {
 	chrome.windows.create({
 		url: 'src/popup/popup.html',
 		type: "popup",
@@ -16,59 +16,100 @@ document.getElementById("popout").addEventListener("click", ()=>{
 });
 
 let changes = null;
-stylesheets.addEventListener("change", async function(event){
-	if(event.target.type == "checkbox") {
-		chrome.runtime.sendMessage({kind: "set", element: {kind: "checkbox", name: event.target.dataset.name}, value: event.target.checked});
-	} else if(event.target.type == "text") {
-		let group = event.path[3].querySelector(".groupName").innerText;
-		let propertyName = event.path[1].querySelector(".propertyName").innerText;
-		let value = event.target.value;
-		chrome.runtime.sendMessage({kind: "set", element: {kind: "text", name: null}, value: {group: group, propertyName: propertyName, value: value}});
+// Listen for all changes and determine input type in event handler
+stylesheets.addEventListener("change", async function (event) {
+	if (event.target.type == "checkbox") { // User enables/disables a stylesheet
+		// Message sent to background page is forwarded to content script
+		chrome.runtime.sendMessage({
+			kind: "set",
+			element: {
+				kind: "checkbox",
+				name: event.target.dataset.name
+			},
+			value: event.target.checked
+		});
+	} else if (event.target.type == "text") { // User changed custom property value
+		// Message sent to background page is forwarded to content script
+		chrome.runtime.sendMessage({
+			kind: "set",
+			element: {
+				kind: "text",
+				name: null
+			},
+			value: {
+				group: event.path[3].querySelector(".groupName").innerText,
+				propertyName: event.path[1].querySelector(".propertyName").innerText,
+				value: event.target.value
+			}
+		});
 	}
 });
 
 getSheets();
 
-async function getSheets(){
-	chrome.runtime.sendMessage({kind: "get"}, (response)=>{
-		if(!response){
+// Sends message to content page to recieve loaded stylesheets
+async function getSheets() {
+	chrome.runtime.sendMessage({ kind: "get" }, (response) => {
+		if (!response) {
 			stylesheets.innerText = "Error";
-		}else{
+		} else {
+			// Remove all elements
 			stylesheets.innerHTML = "";
+
 			let sheets = response.sheets;
 			let style = response.style;
-			//console.log(response);
-			sheets.sort((x, y)=>x.name.localeCompare(y.name));
-			for(let i in sheets){
-				let sheet = sheets[i];
-				stylesheets.appendChild(createStylesheetNode(sheet, style));
+
+			sheets.sort((x, y) => x.name.localeCompare(y.name));
+
+			for (let i in sheets) {
+				stylesheets.appendChild(createStylesheetNode(sheets[i], style));
 			}
 		}
 	});
 }
 
-function createStylesheetNode(sheet, style){
+// Create stylesheet html node from object representation
+/**
+ * sheet = {
+ * 		name: _discord.css (if discord's stylesheet) or name of imported stylesheet (e.g. base.css),
+ * 		disabled: boolean,
+ * 		groups : [...] (array of custom property groups) 
+ * }
+ * 
+ * style = {
+ * 		.selectorWithChanges = {
+ * 			--property-changed: value
+ * 		}
+ * 		[, ...]
+ * }
+ * style can also be empty
+ */
+function createStylesheetNode(sheet, style) {
+	// Use template for html structure
 	let clon = s_template.content.cloneNode(true);
 	clon.querySelector(".stylesheetName").innerText = sheet.name;
+
+	// Set properties for checkbox (for enabling/disabling stylesheets)
 	let cb = clon.querySelector(".stylesheetEnabled");
 	cb.dataset.name = sheet.name;
-	if(sheet.name == "_discord.css"){
+	if (sheet.name == "_discord.css") { // Prevent discord's stylesheet from being disabled
 		cb.parentElement.removeChild(cb);
-	} else{
+	} else { // Use saved setting, default = disabled
 		cb.checked = !sheet.disabled;
 	}
+
+	// Add properties to group (one group = one css selector)
 	let grup = clon.querySelector(".groups");
-	if(sheet.groups?.length){
+	if (sheet.groups?.length) { // Stylesheet contains at least one property
+		// If stylesheet contains only one group, open it by default
 		let single = false;
-		if(sheet.groups.length == 1){
+		if (sheet.groups.length == 1) {
 			single = true;
 		}
-		//console.log(sheet.name);
-		//console.log(single);
-		for(i in sheet.groups){
+		for (i in sheet.groups) {
 			grup.appendChild(createGroupNode(sheet.groups[i], style, single));
 		}
-	} else{
+	} else { // Stylesheet contains no custom properties
 		let notice = document.createElement("span");
 		notice.innerText = "No properties in sheet";
 		notice.classList.add("nopropertyNotice");
@@ -76,20 +117,41 @@ function createStylesheetNode(sheet, style){
 	}
 	return clon;
 }
-function createGroupNode(group, style, isOpen){
+// Create group html node from object representation
+/**
+ * group = {
+ * 		name: name of selector that contains the properties,
+ * 		properties : [...] (array of custom properties) 
+ * }
+ * 
+ * style = {
+ * 		.selectorWithChanges = {
+ * 			--property-changed: value
+ * 		}
+ * 		[, ...]
+ * }
+ * style can also be empty
+ * 
+ * isOpen .. initial state of details html tag
+ */
+function createGroupNode(group, style, isOpen) {
+	// Use template for html structure
 	let clon = g_template.content.cloneNode(true);
 	clon.querySelector(".group").open = isOpen;
 	clon.querySelector(".groupName").innerText = group.name;
+
 	let prop = clon.querySelector(".properties");
-	for(i in group.properties){
-		prop.appendChild(createPropertyNode(group.properties[i], style ? style[group.name] : null));
+	for (i in group.properties) {
+		prop.appendChild(createPropertyNode(group.properties[i], style[group.name]));
 	}
 	return clon;
 }
-function createPropertyNode(property, groupStyle){
+function createPropertyNode(property, groupStyle) {
+	// Use template for html structure
 	let clon = p_template.content.cloneNode(true);
 	clon.querySelector(".propertyName").innerText = property.name;
-	if(groupStyle && groupStyle[property.name]) {
+	// Apply saved property value if present
+	if (groupStyle && groupStyle[property.name]) {
 		clon.querySelector(".propertyInput").value = groupStyle[property.name];
 	}
 	return clon;
