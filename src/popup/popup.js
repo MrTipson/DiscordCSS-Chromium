@@ -16,32 +16,37 @@ document.getElementById("popout").addEventListener("click", () => {
 });
 
 let changes = null;
+chrome.storage.sync.get("style", function (response) {
+	changes = response.style || {};
+});
 // Listen for all changes and determine input type in event handler
 stylesheets.addEventListener("change", async function (event) {
 	if (event.target.type == "checkbox") { // User enables/disables a stylesheet
-		// Message sent to background page is forwarded to content script
-		chrome.runtime.sendMessage({
-			kind: "set",
-			element: {
-				kind: "checkbox",
-				name: event.target.dataset.name
-			},
-			value: event.target.checked
-		});
+		// Content script listens for changes in storage
+		let obj = {}
+		obj[event.target.dataset.name] = event.target.checked;
+		chrome.storage.sync.set(obj);
 	} else if (event.target.type == "text") { // User changed custom property value
-		// Message sent to background page is forwarded to content script
-		chrome.runtime.sendMessage({
-			kind: "set",
-			element: {
-				kind: "text",
-				name: null
-			},
-			value: {
-				group: event.path[3].querySelector(".groupName").innerText,
-				propertyName: event.path[1].querySelector(".propertyName").innerText,
-				value: event.target.value
+		// Retrieve values from event
+		let group = event.path[3].querySelector(".groupName").innerText;
+		let propertyName = event.path[1].querySelector(".propertyName").innerText;
+		let value = event.target.value;
+
+		// Make sure group is present unless property is getting deleted
+		if (!changes[group] && value != "") {
+			changes[group] = {};
+		}
+		if (value == "") { // Delete property from changes object
+			delete changes[group][propertyName];
+			// If group is now empty, delete it as well
+			if (!changes[group].length) {
+				delete changes[group];
 			}
-		});
+		} else { // Value is getting set and not deleted
+			changes[group][propertyName] = value;
+		}
+		// Save changes
+		chrome.storage.sync.set({ style: changes });
 	}
 });
 
@@ -49,20 +54,17 @@ getSheets();
 
 // Sends message to content page to recieve loaded stylesheets
 async function getSheets() {
-	chrome.runtime.sendMessage({ kind: "get" }, (response) => {
+	chrome.runtime.sendMessage("plsGib", (response) => {
 		if (!response) {
 			stylesheets.innerText = "Error";
 		} else {
 			// Remove all elements
 			stylesheets.innerHTML = "";
 
-			let sheets = response.sheets;
-			let style = response.style;
+			response.sort((x, y) => x.name.localeCompare(y.name));
 
-			sheets.sort((x, y) => x.name.localeCompare(y.name));
-
-			for (let i in sheets) {
-				stylesheets.appendChild(createStylesheetNode(sheets[i], style));
+			for (let i in response) {
+				stylesheets.appendChild(createStylesheetNode(response[i], changes));
 			}
 		}
 	});

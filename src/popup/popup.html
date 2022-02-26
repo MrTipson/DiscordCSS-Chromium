@@ -1,33 +1,36 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<link rel="stylesheet" href="popup.css">
-	</head>
-	<body>
-		<button id="refresh">Refresh</button>
-		<button id="popout">Popout</button>
-		<div id="stylesheets"></div>
-	</body>
-	<template id="stylesheetTemplate">
-		<details class="stylesheet">
-			<summary>
-				<input class="stylesheetEnabled" type="checkbox">
-				<span class="stylesheetName"></span>
-			</summary>
-			<div class="groups"></div>
-		</details>
-	</template>
-	<template id="groupTemplate">
-		<details class="group">
-			<summary class="groupName"></summary>
-			<div class="properties"></div>
-		</details>
-	</template>
-	<template id="propertyTemplate">
-		<div class="property">
-			<label class="propertyName"></label>
-			<input class="propertyInput" type="text"/>
-		</div>
-	</template>
-	<script src="popup.js"></script>
+
+<head>
+	<link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+	<button id="refresh">Refresh</button>
+	<button id="popout">Popout</button>
+	<div id="stylesheets"></div>
+</body>
+<template id="stylesheetTemplate">
+	<details class="stylesheet">
+		<summary>
+			<input class="stylesheetEnabled" type="checkbox">
+			<span class="stylesheetName"></span>
+		</summary>
+		<div class="groups"></div>
+	</details>
+</template>
+<template id="groupTemplate">
+	<details class="group">
+		<summary class="groupName"></summary>
+		<div class="properties"></div>
+	</details>
+</template>
+<template id="propertyTemplate">
+	<div class="property">
+		<label class="propertyName"></label>
+		<input class="propertyInput" type="text" />
+	</div>
+</template>
+<script src="popup.js"></script>
+
 </html>

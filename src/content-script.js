@@ -16,65 +16,42 @@
  * 					value: property value
  * 				} 
  */
+let wrapper;
 chrome.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
-		let temp = document.getElementById("discordcss-wrapper");
-
 		// Make sure wrapper is present
-		if (!temp) {
+		if (!wrapper) {
 			sendResponse(false);
-			return true;
-		}
-
-		if (request.kind == "get") { // Return list of loaded stylesheets
+		} else {
 			sendResponse(parseDocumentCSS());
-		} else if (request.kind == "set") { // Commit changes made in extension popup
-			if (request.element.kind == "checkbox") { // Enable/disable a stylesheet
-				let sheet = temp.querySelector(`[data-name="${request.element.name}"]`);
-				sheet.disabled = !request.value;
-				// Save change
-				let obj = {}
-				obj[request.element.name] = request.value;
-				chrome.storage.sync.set(obj);
-			} else if (request.element.kind == "text") { // Change property value
-				// Retrieve values from request object
-				let group = request.value.group;
-				let propertyName = request.value.propertyName;
-				let value = request.value.value;
-
-				// Make sure group is present unless property is getting deleted
-				if (!changes[group] && value != "") {
-					changes[group] = {};
-				}
-				if (value == "") { // Delete property from changes object
-					delete changes[group][propertyName];
-					// If group is now empty, delete it as well
-					if (!changes[group].length) {
-						delete changes[group];
-					}
-				} else { // Value is getting set and not deleted
-					changes[group][propertyName] = value;
-				}
-				// Save changes
-				chrome.storage.sync.set({ style: changes });
-				document.getElementById("discordcss-custom-style").innerHTML = changesString();
-			}
-			sendResponse(true);
 		}
 		return true;
 	}
 );
-let changes = null;
+chrome.storage.sync.onChanged.addListener(function (changes) {
+	console.log(changes);
+	for (let key in changes) {
+		if (key == "style") {
+			document.getElementById("discordcss-custom-style").innerHTML = changesString(changes[key].newValue);
+		} else {
+			let sheet = wrapper.querySelector(`[data-name="${key}"]`);
+			if (sheet) {
+				sheet.disabled = !changes[key].newValue;
+			}
+		}
+	}
+});
+
 fetchStylesheets(async function (sheets) {
 	// Create wrapper div for all stylesheets
-	let temp = document.createElement("div");
-	temp.id = "discordcss-wrapper";
+	wrapper = document.createElement("div");
+	wrapper.id = "discordcss-wrapper";
 	// Create array with storage keys
 	let entries = sheets.map((x) => x.split("/").pop());
 	entries.push("style");
 	// Fetch storage entries
 	let settings = await chrome.storage.sync.get(entries);
-	changes = settings.style || {};
+	let customstyle = settings.style || {};
 	// Inject all stylesheets
 	for (let i in sheets) {
 		get(sheets[i], function (response) {
@@ -82,16 +59,16 @@ fetchStylesheets(async function (sheets) {
 			let name = sheets[i].split("/").pop();
 			sheet.dataset.name = name;
 			sheet.innerHTML = response;
-			temp.appendChild(sheet);
+			wrapper.appendChild(sheet);
 			sheet.disabled = !(settings && settings[name]);
 		});
 	}
 	// Inject custom property values
 	let style = document.createElement("style");
 	style.id = "discordcss-custom-style";
-	style.innerHTML = changesString() || "";
-	temp.appendChild(style);
-	document.head.appendChild(temp);
+	style.innerHTML = changesString(customstyle) || "";
+	wrapper.appendChild(style);
+	document.head.appendChild(wrapper);
 });
 console.log("\033[36m%s \033[39m%s", "[DiscordCSS]", "Injected");
 // Parse document stylesheet objects into names and values of custom css properties and their respective selectors and stylesheets
@@ -116,37 +93,34 @@ console.log("\033[36m%s \033[39m%s", "[DiscordCSS]", "Injected");
  * 	]
  */
 function parseDocumentCSS() {
-	return {
-		sheets: [...document.styleSheets]
-			.map((stylesheet) => {
-				return {
-					name: (stylesheet.href && "_discord.css") || stylesheet.ownerNode.dataset.name,
-					disabled: stylesheet.disabled,
-					groups: [...stylesheet.cssRules]
-						.filter((rule) => rule.type === 1)
-						.map((rule) => {
-							return {
-								name: rule.selectorText,
-								properties: [...rule.styleMap.entries()]
-									.filter((property) => property[0].indexOf("--") === 0)
-									.map((property) => {
-										return {
-											name: property[0],
-											value: property[1]
-										}
-									})
-							}
-						})
-						.filter((group) => group.properties.length)
-				}
-			})
-			.filter((stylesheet) => stylesheet.name),
-		style: changes
-	};
+	return [...document.styleSheets]
+		.map((stylesheet) => {
+			return {
+				name: (stylesheet.href && "_discord.css") || stylesheet.ownerNode.dataset.name,
+				disabled: stylesheet.disabled,
+				groups: [...stylesheet.cssRules]
+					.filter((rule) => rule.type === 1)
+					.map((rule) => {
+						return {
+							name: rule.selectorText,
+							properties: [...rule.styleMap.entries()]
+								.filter((property) => property[0].indexOf("--") === 0)
+								.map((property) => {
+									return {
+										name: property[0],
+										value: property[1]
+									}
+								})
+						}
+					})
+					.filter((group) => group.properties.length)
+			}
+		})
+		.filter((stylesheet) => stylesheet.name);
 }
 
 // Convert changes object to a css formatted string (to be injected into a style tag)
-function changesString() {
+function changesString(changes) {
 	let tostring = "";
 	for (let grp in changes) {
 		tostring += `${grp} {`;
