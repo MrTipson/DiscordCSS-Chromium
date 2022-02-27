@@ -1,22 +1,28 @@
 {
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "discordcss@test.com",
+			"strict_min_version": "42.0"
+		}
+	},
 	"name": "DiscordCSS",
 	"description": "Browser extension for https://github.com/MrTipson/DiscordCSS. Custom CSS injection for Discord with integrated stylesheet customizations.",
 	"version": "1.0",
-	"manifest_version": 3,
+	"manifest_version": 2,
+	"content_security_policy": "script-src 'self' https://discord.com; object-src 'self'",
 	"background": {
-		"service_worker": "src/background.js"
+		"scripts": [
+			"src/background.js"
+		]
 	},
 	"permissions": [
-		"storage",
-		"declarativeContent"
-	],
-	"host_permissions": [
-		"*://discord.com/*"
+		"*://discord.com/*",
+		"storage"
 	],
 	"content_scripts": [
 		{
 			"matches": [
-				"*://discord.com/*"
+				"<all_urls>"
 			],
 			"js": [
 				"src/common.js",
@@ -24,7 +30,16 @@
 			]
 		}
 	],
-	"action": {
+	"browser_action": {
+		"default_icon": {
+			"32": "img/icon32.png",
+			"64": "img/icon64.png",
+			"128": "img/icon128.png"
+		},
+		"default_title": "DiscordCSS",
+		"default_popup": "src/popup/popup.html"
+	},
+	"page_action": {
 		"default_title": "DiscordCSS",
 		"default_popup": "src/popup/popup.html",
 		"default_icon": {

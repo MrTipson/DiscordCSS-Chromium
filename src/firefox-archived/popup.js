@@ -3,8 +3,8 @@ const stylesheets = document.getElementById("stylesheets");
 document.getElementById("refresh").addEventListener("click", getSheets);
 
 document.getElementById("popout").addEventListener("click", () => {
-	chrome.windows.create({
-		url: 'src/popup/popup.html',
+	browser.windows.create({
+		url: browser.extension.getURL('src/popup/popup.html'),
 		type: "popup",
 		width: 500,
 		height: 350
@@ -13,20 +13,21 @@ document.getElementById("popout").addEventListener("click", () => {
 });
 
 let changes = null;
-chrome.storage.sync.get("style", function (response) {
-	changes = response.style || {};
-});
+browser.storage.sync.get("style")
+	.then((saved) => changes = saved.style || {});
+
 // Listen for all changes and determine input type in event handler
 stylesheets.addEventListener("change", async function (event) {
+	let path = event.composedPath();
 	if (event.target.type == "checkbox") { // User enables/disables a stylesheet
 		// Content script listens for changes in storage
 		let obj = {}
 		obj[event.target.dataset.name] = event.target.checked;
-		chrome.storage.sync.set(obj);
+		browser.storage.sync.set(obj);
 	} else if (event.target.type == "text") { // User changed custom property value
 		// Retrieve values from event
-		let group = event.path[3].querySelector(".groupName").innerText;
-		let propertyName = event.path[1].querySelector(".propertyName").innerText;
+		let group = path[3].querySelector(".groupName").innerText;
+		let propertyName = path[1].querySelector(".propertyName").innerText;
 		let value = event.target.value;
 
 		// Make sure group is present unless property is getting deleted
@@ -43,7 +44,7 @@ stylesheets.addEventListener("change", async function (event) {
 			changes[group][propertyName] = value;
 		}
 		// Save changes
-		chrome.storage.sync.set({ style: changes });
+		browser.storage.sync.set({ style: changes });
 	}
 });
 
@@ -51,18 +52,19 @@ getSheets();
 
 // Sends message to content page to recieve loaded stylesheets
 async function getSheets() {
-	chrome.runtime.sendMessage("plsGib", (response) => {
-		if (!response) {
-			stylesheets.innerText = "Error";
-		} else {
-			// Remove all elements
-			stylesheets.innerHTML = "";
+	browser.runtime.sendMessage(null, "plsGib")
+		.then((response) => {
+			if (!response) {
+				stylesheets.innerText = "Error";
+			} else {
+				// Remove all elements
+				stylesheets.innerHTML = "";
 
-			response.sort((x, y) => x.name.localeCompare(y.name));
+				response.sort((x, y) => x.name.localeCompare(y.name));
 
-			for (let i in response) {
-				stylesheets.appendChild(createStylesheetNode(response[i], changes));
+				for (let i in response) {
+					stylesheets.appendChild(createStylesheetNode(response[i], changes));
+				}
 			}
-		}
-	});
+		});
 }

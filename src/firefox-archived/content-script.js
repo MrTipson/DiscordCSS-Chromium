@@ -1,6 +1,6 @@
 // Listen for requests from popup
 let wrapper;
-chrome.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
 		// Make sure wrapper is present
 		if (!wrapper) {
@@ -12,13 +12,13 @@ chrome.runtime.onMessage.addListener(
 	}
 );
 // React to storage change events
-chrome.storage.sync.onChanged.addListener(function (changes) {
+browser.storage.onChanged.addListener(function (changes) {
 	for (let key in changes) {
 		if (key == "style") { // custom property was changed
 			document.getElementById("discordcss-custom-style").innerHTML = changesString(changes[key].newValue);
-		} else {
+		} else { // stylesheet was enabled/disabled
 			let sheet = wrapper.querySelector(`[data-name="${key}"]`);
-			if (sheet) { // stylesheet was enabled/disabled
+			if (sheet) {
 				sheet.disabled = !changes[key].newValue;
 			}
 		}
@@ -26,14 +26,19 @@ chrome.storage.sync.onChanged.addListener(function (changes) {
 });
 
 fetchStylesheets(async function (sheets) {
+	wrapper = document.getElementById("discordcss-wrapper");
+	if (wrapper) {
+		wrapper.innerHTML = "";
+	} else {
+		wrapper = document.createElement("div");
+		wrapper.id = "discordcss-wrapper";
+	}
 	// Create wrapper div for all stylesheets
-	wrapper = document.createElement("div");
-	wrapper.id = "discordcss-wrapper";
 	// Create array with storage keys
 	let entries = sheets.map((x) => x.split("/").pop());
 	entries.push("style");
 	// Fetch storage entries
-	let settings = await chrome.storage.sync.get(entries);
+	let settings = await browser.storage.sync.get(entries);
 	let customstyle = settings.style || {};
 	// Inject all stylesheets
 	for (let i in sheets) {
@@ -41,7 +46,7 @@ fetchStylesheets(async function (sheets) {
 			let sheet = document.createElement("style");
 			let name = sheets[i].split("/").pop();
 			sheet.dataset.name = name;
-			sheet.innerText = response;
+			sheet.innerHTML = response;
 			wrapper.appendChild(sheet);
 			sheet.disabled = !(settings && settings[name]);
 		});
@@ -49,21 +54,13 @@ fetchStylesheets(async function (sheets) {
 	// Inject custom property values
 	let style = document.createElement("style");
 	style.id = "discordcss-custom-style";
-	style.innerText = changesString(customstyle) || "";
-	// Make 'sure' it loads last so it has priority
-	setTimeout(() => document.head.appendChild(style), 1000);
+	style.innerHTML = changesString(customstyle) || "";
+	wrapper.appendChild(style);
 	document.head.appendChild(wrapper);
 });
 console.log("%c%s %c%s", "color: #00D4C0;", "[DiscordCSS]", "color: initial;", "Injected");
 
 // Wrapper for making web requests 
 function get(url, callback) {
-	let xhr = new XMLHttpRequest();
-	xhr.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			callback(xhr.responseText);
-		}
-	};
-	xhr.open("GET", url);
-	xhr.send();
+	browser.runtime.sendMessage(url, callback);
 }
