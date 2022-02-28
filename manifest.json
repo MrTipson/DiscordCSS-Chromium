@@ -26,7 +26,6 @@
 	],
 	"action": {
 		"default_title": "DiscordCSS",
-		"default_popup": "src/popup/popup.html",
 		"default_icon": {
 			"32": "img/icon32.png",
 			"64": "img/icon64.png",

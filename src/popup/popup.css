@@ -85,9 +85,32 @@ details[open] > summary::before {
 .propertyInput {
 	outline: none;
 	flex-shrink: 2;
+	flex-grow: 1;
 	width: 70%;
 	color: var(--text-normal);
 	background-color: var(--modifier-light);
 	border: none;
 	border-bottom: solid 1px white;
+}
+.propertyInput:not(:placeholder-shown){
+	border-color: greenyellow;
+}
+.propertyInput::placeholder {
+	color: var(--text-muted);
+}
+.colorInput {
+	padding: 0;
+	border: none;
+	background-color: transparent;
+	flex-shrink: 0;
+	width: 1rem;
+	height: 1rem;
+	-webkit-appearance: none;
+	outline: none;
+}
+.colorInput::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.colorInput::-webkit-color-swatch {
+    border: none;
 }

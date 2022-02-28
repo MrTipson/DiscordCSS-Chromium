@@ -19,6 +19,15 @@ function init() {
 	});
 }
 
+chrome.action.onClicked.addListener(function () {
+	chrome.windows.create({
+		url: 'src/popup/popup.html',
+		type: "popup",
+		width: 500,
+		height: 350
+	});
+});
+
 // Pass on messages received from the popup to the content script
 chrome.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
