@@ -34,7 +34,7 @@ function changeProperty(group, propertyName, value) {
 	if (value == "") { // Delete property from changes object
 		delete changes[group][propertyName];
 		// If group is now empty, delete it as well
-		if (!changes[group].length) {
+		if (!Object.keys(changes[group]).length) {
 			delete changes[group];
 		}
 	} else { // Value is getting set and not deleted

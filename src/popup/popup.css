@@ -11,14 +11,15 @@
 	--modifier-light: rgba(255, 255, 255, 0.25);
 }
 html, body{
-	height: auto;
-	width: auto;
+	height: 100%;
+	width: 100%;
 }
 body {
 	min-width: 350px;
 	background-color: var(--background-primary);
 	color: var(--text-normal);
 	font-size: 12pt;
+	margin: 0;
 }
 body::-webkit-scrollbar {
 	height: 5px;
@@ -31,8 +32,20 @@ body::-webkit-scrollbar-thumb {
 body::-webkit-scrollbar-corner {
 	display: none;
 }
-.stylesheets {
-	padding: 2px;
+nav {
+	top: 0;
+	background-color: var(--modifier-dark);
+	border-bottom: 1px solid green;
+	width: 100%;
+	padding: 5px 10px 10px;
+	z-index: 1;
+}
+.title {
+	font-weight: 750;
+	font-size: 15pt;
+}
+#stylesheets {
+	padding: 5px 10px;
 }
 .stylesheet > summary {
 	display: flex;
@@ -57,6 +70,9 @@ details > summary::before {
 }
 details[open] > summary::before {
 	transform: rotate(45deg)
+}
+.stylesheet[open] {
+	margin-bottom: 10px;
 }
 .groups{
 	margin-left: 20px;
