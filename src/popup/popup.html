@@ -10,6 +10,13 @@
 		<div class="title">DiscordCSS</div>
 	</nav>
 	<div id="stylesheets"></div>
+	<div class="pickerWrapper pickerHidden">
+		<div id="colorPicker"></div>
+		<div class="pickerInfo">
+			<input type="button" class="btn btn-nice" value="Save">
+			<input type="button" class="btn" value="Revert">
+		</div>
+	</div>
 </body>
 <template id="stylesheetTemplate">
 	<details class="stylesheet">
@@ -30,9 +37,10 @@
 	<div class="property">
 		<label class="propertyName"></label>
 		<input class="propertyInput" type="text" />
-		<input class="colorInput" type="color" />
+		<input class="colorInput" type="button" />
 	</div>
 </template>
+<script src="iro.min.js"></script>
 <script src="popup.js"></script>
 <script src="build-page.js"></script>
 

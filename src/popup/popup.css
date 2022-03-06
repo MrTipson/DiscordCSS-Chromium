@@ -5,10 +5,12 @@
 }
 :root {
 	--background-primary: #36393F;
+	--background-secondary: #202025;
 	--text-normal: white;
 	--text-muted: lightgray;
 	--modifier-dark: rgba(0, 0, 0, 0.5);
 	--modifier-light: rgba(255, 255, 255, 0.25);
+	--button-nice: rgb(80, 185, 255);
 }
 html, body{
 	height: 100%;
@@ -115,18 +117,29 @@ details[open] > summary::before {
 	color: var(--text-muted);
 }
 .colorInput {
-	padding: 0;
-	border: none;
-	background-color: transparent;
-	flex-shrink: 0;
 	width: 1rem;
 	height: 1rem;
-	-webkit-appearance: none;
-	outline: none;
+	border-width: 1px;
 }
-.colorInput::-webkit-color-swatch-wrapper {
-    padding: 0;
+.pickerWrapper {
+	display: flex;
+	justify-content: space-between;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: var(--background-secondary);
+	padding: 10px;
+	border-radius: 10px 10px 0 0;
+	transition: bottom 1s;
 }
-.colorInput::-webkit-color-swatch {
-    border: none;
+.pickerHidden {
+	bottom: -200px;
+}
+.btn {
+	padding: 3px 10px;
+	border: none;
+}
+.btn-nice {
+	background-color: var(--button-nice);
 }

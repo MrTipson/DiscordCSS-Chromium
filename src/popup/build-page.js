@@ -85,10 +85,10 @@ function createPropertyNode(property, groupStyle) {
 	clon.querySelector(".propertyName").innerText = property.name;
 	// Apply saved property value if present
 	clon.querySelector(".propertyInput").placeholder = property.value;
-	clon.querySelector(".colorInput").value = property.value;
+	clon.querySelector(".colorInput").style.backgroundColor = property.value;
 	if (groupStyle && groupStyle[property.name]) {
 		clon.querySelector(".propertyInput").value = groupStyle[property.name];
-		clon.querySelector(".colorInput").value = groupStyle[property.name];
+		clon.querySelector(".colorInput").style.backgroundColor = groupStyle[property.name];
 	}
 	return clon;
 }

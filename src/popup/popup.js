@@ -1,10 +1,64 @@
 // commonly used elements
 const stylesheets = document.getElementById("stylesheets");
+const picker = document.querySelector(".pickerWrapper");
+const iro = window.iro;
 
 let changes = null;
 chrome.storage.sync.get("style", function (response) {
 	changes = response.style || {};
 });
+
+var colorPicker = new iro.ColorPicker("#colorPicker", {
+	width: 150,
+	color: "rgb(255, 0, 0)",
+	borderWidth: 1,
+	borderColor: "#fff",
+	layoutDirection: "horizontal",
+	layout: [
+		{
+			component: iro.ui.Box,
+		},
+		{
+			component: iro.ui.Slider,
+			options: {
+				id: 'hue-slider',
+				sliderType: 'hue'
+			}
+		},
+		{
+			component: iro.ui.Slider,
+			options: {
+				id: 'alpha-slider',
+				sliderType: 'alpha'
+			}
+		}
+	]
+});
+
+stylesheets.addEventListener("click", function (event) {
+	if (event.target.className == "colorInput") {
+		let group = event.path[3].querySelector(".groupName").innerText;
+		let propertyName = event.path[1].querySelector(".propertyName").innerText;
+		colorPicker.activeEl = { group: group, propertyName: propertyName, propertyElement: event.path[1] };
+		picker.classList.remove("pickerHidden");
+	}
+});
+picker.addEventListener("click", function (event) {
+	let el = event.target;
+	if (el.type == "button") {
+		if (el.value == "Save" && colorPicker.activeEl) {
+			let color = colorPicker.color.alpha == 1 && colorPicker.color.hexString || colorPicker.color.hex8String;
+			colorPicker.activeEl.propertyElement.querySelector(".propertyInput").value = color;
+			colorPicker.activeEl.propertyElement.querySelector(".colorInput").style.backgroundColor = color;
+			changeProperty(colorPicker.activeEl.group, colorPicker.activeEl.propertyName, color);
+		}
+		if (colorPicker.activeEl) {
+			delete colorPicker.activeEl;
+		}
+		picker.classList.add("pickerHidden");
+	}
+});
+
 // Listen for all changes and determine input type in event handler
 stylesheets.addEventListener("change", async function (event) {
 	if (event.target.type == "checkbox") { // User enables/disables a stylesheet
