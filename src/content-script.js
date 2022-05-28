@@ -1,12 +1,15 @@
 // Listen for requests from popup
 let wrapper;
+let live;
 chrome.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
 		// Make sure wrapper is present
 		if (!wrapper) {
 			sendResponse(false);
-		} else {
+		} else if (request === "plsGib") {
 			sendResponse(parseDocumentCSS());
+		} else {
+			live.innerText = request ? `${request.group}{${request.property}: ${request.value};}` : "";
 		}
 		return true;
 	}
@@ -50,8 +53,13 @@ fetchStylesheets(async function (sheets) {
 	let style = document.createElement("style");
 	style.id = "discordcss-custom-style";
 	style.innerText = changesString(customstyle) || "";
+	live = document.createElement("style");
+	live.id = "discordcss-live-changes";
 	// Make 'sure' it loads last so it has priority
-	setTimeout(() => document.head.appendChild(style), 1000);
+	setTimeout(() => {
+		document.head.appendChild(style);
+		document.head.appendChild(live);
+	}, 1000);
 	document.head.appendChild(wrapper);
 });
 console.log("%c%s %c%s", "color: #00D4C0;", "[DiscordCSS]", "color: initial;", "Injected");

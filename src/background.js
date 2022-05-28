@@ -33,9 +33,7 @@ chrome.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
 		// Find active discord tab
 		chrome.tabs.query({ active: true, url: "https://discord.com/*" }, function ([activeTab]) {
-			chrome.tabs.sendMessage(activeTab.id, request, function (response) {
-				sendResponse(response);
-			});
+			chrome.tabs.sendMessage(activeTab.id, request, sendResponse);
 		});
 		return true;
 	}

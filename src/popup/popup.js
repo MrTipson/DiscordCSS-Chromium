@@ -34,12 +34,17 @@ var colorPicker = new iro.ColorPicker("#colorPicker", {
 		}
 	]
 });
+colorPicker.on("color:change", function (color) {
+	chrome.runtime.sendMessage({ group: colorPicker.activeEl.group, property: colorPicker.activeEl.propertyName, value: color.hex8String });
+});
 
 stylesheets.addEventListener("click", function (event) {
 	if (event.target.className == "colorInput") {
 		let group = event.path[3].querySelector(".groupName").innerText;
 		let propertyName = event.path[1].querySelector(".propertyName").innerText;
 		colorPicker.activeEl = { group: group, propertyName: propertyName, propertyElement: event.path[1] };
+		let color = event.path[1].querySelector(".propertyInput");
+		colorPicker.color.set(color.value ? color.value : color.placeholder);
 		picker.classList.remove("pickerHidden");
 	}
 });
@@ -52,6 +57,8 @@ picker.addEventListener("click", function (event) {
 			colorPicker.activeEl.propertyElement.querySelector(".colorInput").style.backgroundColor = color;
 			changeProperty(colorPicker.activeEl.group, colorPicker.activeEl.propertyName, color);
 		}
+		// Reset live color update element
+		chrome.runtime.sendMessage(null);
 		if (colorPicker.activeEl) {
 			delete colorPicker.activeEl;
 		}
