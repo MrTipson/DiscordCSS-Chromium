@@ -1,7 +1,7 @@
 all: clean deps zip
 
-zip:
-	zip -r extension.zip . -x \*.zip src/firefox-archived/\* .git/\* .gitignore Makefile
+zip: deps
+	zip -r extension.zip . -x \*.zip src/firefox-archived/\* .git/\* docs/\* \*.md .gitignore Makefile
 
 deps:
 	wget -O src/popup/iro.min.js https://raw.githubusercontent.com/jaames/iro.js/master/dist/iro.min.js
