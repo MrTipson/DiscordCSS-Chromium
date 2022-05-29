@@ -32,8 +32,10 @@ chrome.action.onClicked.addListener(function () {
 chrome.runtime.onMessage.addListener(
 	function (request, sender, sendResponse) {
 		// Find active discord tab
-		chrome.tabs.query({ active: true, url: "https://discord.com/*" }, function ([activeTab]) {
-			chrome.tabs.sendMessage(activeTab.id, request, sendResponse);
+		chrome.tabs.query({ url: "https://discord.com/*" }, function (tabs) {
+			for (let tab of tabs) {
+				chrome.tabs.sendMessage(tab.id, request, sendResponse);
+			}
 		});
 		return true;
 	}
