@@ -8,14 +8,21 @@
 <body>
 	<nav>
 		<div class="title">DiscordCSS</div>
+		<button class="btn float-r" id="export">Export</button>
 	</nav>
 	<div id="stylesheets"></div>
-	<div class="pickerWrapper pickerHidden">
-		<div id="colorPicker"></div>
-		<div class="pickerInfo">
-			<input type="button" class="btn btn-nice" value="Save">
-			<input type="button" class="btn" value="Revert">
+	<div class="drawer drawerHidden noanimation" id="pickerDrawer">
+		<div class="pickerWrapper">
+			<div id="colorPicker"></div>
+			<div class="pickerInfo">
+				<input type="button" class="btn btn-nice" value="Save">
+				<input type="button" class="btn" value="Revert">
+			</div>
 		</div>
+	</div>
+	<div class="drawer drawerHidden noanimation" id="exportDrawer">
+		<textarea name="exportField" id="exportField"></textarea>
+		<input type="button" class="btn" value="Close">
 	</div>
 </body>
 <template id="stylesheetTemplate">

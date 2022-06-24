@@ -1,6 +1,6 @@
 // commonly used elements
 const stylesheets = document.getElementById("stylesheets");
-const picker = document.querySelector(".pickerWrapper");
+const picker = document.getElementById("pickerDrawer");
 const iro = window.iro;
 
 let changes = null;
@@ -45,7 +45,7 @@ stylesheets.addEventListener("click", function (event) {
 		colorPicker.activeEl = { group: group, propertyName: propertyName, propertyElement: event.path[1] };
 		let color = event.path[1].querySelector(".propertyInput");
 		colorPicker.color.set(color.value ? color.value : color.placeholder);
-		picker.classList.remove("pickerHidden");
+		picker.classList.toggle("drawerHidden", false);
 	}
 });
 picker.addEventListener("click", function (event) {
@@ -62,7 +62,7 @@ picker.addEventListener("click", function (event) {
 		if (colorPicker.activeEl) {
 			delete colorPicker.activeEl;
 		}
-		picker.classList.add("pickerHidden");
+		picker.classList.toggle("drawerHidden", true);
 	}
 });
 
@@ -122,3 +122,46 @@ async function getSheets() {
 		}
 	});
 }
+
+const exportDrawer = document.getElementById("exportDrawer");
+const exportField = document.getElementById("exportField");
+document.getElementById("export").addEventListener("click", exportStylesheet);
+async function exportStylesheet(event) {
+	let settings = await chrome.storage.sync.get();
+	let exportString = "";
+	let styleString = "";
+	console.log(settings)
+	for (let key in settings) {
+		if (key === "style") {
+			let style = settings["style"]
+			for (let group in style) {
+				styleString += `${group} {\n`;
+				for (let propertyName in style[group]) {
+					styleString += `\t${propertyName}: ${style[group][propertyName]};\n`;
+				}
+				styleString += `}\n`;
+			}
+		} else if (settings[key]) {
+			exportString += `@import url("https://mrtipson.github.io/DiscordCSS/css/${key}");\n`;
+		}
+	}
+	if (exportString.length > 0) {
+		exportString += `\n`;
+	}
+	exportString += styleString;
+
+	exportField.value = exportString;
+	exportDrawer.classList.toggle("drawerHidden", false);
+}
+exportDrawer.addEventListener("click", (event) => {
+	if (event.target.value === "Close") {
+		exportDrawer.classList.toggle("drawerHidden", true);
+	}
+});
+
+// Skip the initial animations
+setTimeout(() => {
+	for (let drawer of document.getElementsByClassName("drawer")) {
+		drawer.classList.remove("noanimation");
+	}
+}, 1000);

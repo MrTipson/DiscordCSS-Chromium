@@ -41,6 +41,10 @@ nav {
 	width: 100%;
 	padding: 5px 10px 10px;
 	z-index: 1;
+
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 .title {
 	font-weight: 750;
@@ -121,20 +125,56 @@ details[open] > summary::before {
 	height: 1rem;
 	border-width: 1px;
 }
-.pickerWrapper {
-	display: flex;
-	justify-content: space-between;
+.drawer {
 	position: fixed;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	background-color: var(--background-secondary);
+	animation-fill-mode: forwards;
+	animation-name: drawerSlideUp;
+	animation-duration: 1s;
 	padding: 10px;
-	border-radius: 10px 10px 0 0;
-	transition: bottom 1s;
+	background-color: var(--background-secondary);
 }
-.pickerHidden {
-	bottom: -200px;
+.drawerHidden {
+	animation-name: drawerSlideDown;
+}
+.noanimation {
+	animation-duration: 0s;
+}
+@keyframes drawerSlideUp {
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+@keyframes drawerSlideDown {
+	from {
+		transform: translateY(0);
+	}
+	to {
+		transform: translateY(100%);
+	}
+}
+#exportDrawer {
+	top: 0;
+}
+#exportField {
+	display: block;
+	width: calc(100% - 10px);
+	height: calc(100% - 30px);
+	margin: 5px;
+	padding: 5px;
+	outline: none;
+	border: none;
+	background-color: #0005;
+	color: white;
+}
+.pickerWrapper {
+	display: flex;
+	justify-content: space-between;
 }
 .btn {
 	padding: 3px 10px;
