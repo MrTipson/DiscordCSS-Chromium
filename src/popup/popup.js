@@ -40,10 +40,10 @@ colorPicker.on("color:change", function (color) {
 
 stylesheets.addEventListener("click", function (event) {
 	if (event.target.className == "colorInput") {
-		let group = event.path[3].querySelector(".groupName").innerText;
-		let propertyName = event.path[1].querySelector(".propertyName").innerText;
-		colorPicker.activeEl = { group: group, propertyName: propertyName, propertyElement: event.path[1] };
-		let color = event.path[1].querySelector(".propertyInput");
+		let group = event.composedPath()[3].querySelector(".groupName").innerText;
+		let propertyName = event.composedPath()[1].querySelector(".propertyName").innerText;
+		colorPicker.activeEl = { group: group, propertyName: propertyName, propertyElement: event.composedPath()[1] };
+		let color = event.composedPath()[1].querySelector(".propertyInput");
 		colorPicker.color.set(color.value ? color.value : color.placeholder);
 		picker.classList.toggle("drawerHidden", false);
 	}
@@ -75,11 +75,11 @@ stylesheets.addEventListener("change", async function (event) {
 		chrome.storage.sync.set(obj);
 	} else if (event.target.type == "text" || event.target.type == "color") { // User changed custom property value
 		// Retrieve values from event
-		let group = event.path[3].querySelector(".groupName").innerText;
-		let propertyName = event.path[1].querySelector(".propertyName").innerText;
+		let group = event.composedPath()[3].querySelector(".groupName").innerText;
+		let propertyName = event.composedPath()[1].querySelector(".propertyName").innerText;
 		let value = event.target.value;
 		if (event.target.type == "color") {
-			event.path[1].querySelector(".propertyInput").value = value;
+			event.composedPath()[1].querySelector(".propertyInput").value = value;
 		}
 		changeProperty(group, propertyName, value);
 	}
