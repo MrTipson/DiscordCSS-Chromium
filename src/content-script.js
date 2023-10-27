@@ -55,12 +55,10 @@ fetchStylesheets(async function (sheets) {
 	style.innerText = changesString(customstyle) || "";
 	live = document.createElement("style");
 	live.id = "discordcss-live-changes";
-	// Make 'sure' it loads last so it has priority
-	setTimeout(() => {
-		document.head.appendChild(style);
-		document.head.appendChild(live);
-	}, 1000);
-	document.head.appendChild(wrapper);
+
+	document.documentElement.appendChild(style);
+	document.documentElement.appendChild(live);
+	document.documentElement.appendChild(wrapper);
 });
 console.log("%c%s %c%s", "color: #00D4C0;", "[DiscordCSS]", "color: initial;", "Injected");
 

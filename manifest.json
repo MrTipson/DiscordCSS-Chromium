@@ -1,7 +1,7 @@
 {
 	"name": "DiscordCSS",
 	"description": "Browser extension for https://github.com/MrTipson/DiscordCSS. Custom CSS injection for Discord with integrated stylesheet customizations.",
-	"version": "1.1.3",
+	"version": "1.1.4",
 	"manifest_version": 3,
 	"background": {
 		"service_worker": "src/background.js"
