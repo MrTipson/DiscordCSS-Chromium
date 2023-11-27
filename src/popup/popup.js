@@ -45,6 +45,7 @@ stylesheets.addEventListener("click", function (event) {
 		colorPicker.activeEl = { group: group, propertyName: propertyName, propertyElement: event.composedPath()[1] };
 		let color = event.composedPath()[1].querySelector(".propertyInput");
 		colorPicker.color.set(color.value ? color.value : color.placeholder);
+		picker.getElementsByClassName("pickerCurrentProperty")[0].innerText = propertyName;
 		picker.classList.toggle("drawerHidden", false);
 	}
 });

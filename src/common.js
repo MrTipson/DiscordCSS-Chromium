@@ -1,8 +1,9 @@
 // Parse document stylesheet objects into names and values of custom css properties and their respective selectors and stylesheets
+// Discord's stylesheets are removed due to clutter. They are readded by the popup using hardcoded properties.
 /** Adapted from https://css-tricks.com/how-to-get-all-custom-properties-on-a-page-in-javascript/
  * Returns: [
  * 		{
- * 			name: _discord.css or filename of external stylesheet,
+ * 			name: filename of external stylesheet,
  * 			disabled: boolean,
  * 			groups: [
  * 				name: group name (css selector),
@@ -19,11 +20,20 @@
  * 		[, ...]
  * 	]
  */
+const discordProperties = ["header-primary", "header-secondary", "text-normal", "text-link", "text-muted",
+	"channels-default", "interactive-normal", "interactive-hover", "interactive-muted", "interactive-active",
+	"background-primary", "background-secondary", "background-secondary-alt", "background-tertiary", "background-floating",
+	"input-background", "background-modifier-active", "background-modifier-hover", "background-modifier-selected",
+	"background-modifier-accent", "channeltextarea-background", "background-message-hover",
+	"search-popout-option-user-username", "search-popout-option-user-nickname", "search-popout-option-non-text-color",
+	"scrollbar-thin-thumb", "scrollbar-thin-track", "scrollbar-auto-thumb", "scrollbar-auto-track",
+	"messages-scroll-thumb", "messages-scroll-track", "radio-bar-accent-color"
+]
 function parseDocumentCSS() {
-	return [...document.styleSheets]
+	let stylesheets = [...document.styleSheets]
 		.map((stylesheet) => {
 			return {
-				name: (stylesheet.href && "_discord.css") || stylesheet.ownerNode.dataset.name,
+				name: stylesheet.ownerNode.dataset.name,
 				disabled: stylesheet.disabled,
 				groups: [...stylesheet.cssRules]
 					.filter((rule) => rule.type === 1)
@@ -44,6 +54,31 @@ function parseDocumentCSS() {
 			}
 		})
 		.filter((stylesheet) => stylesheet.name);
+	let dummy = document.createElement("div");
+	dummy.style.display = 'none';
+	document.body.appendChild(dummy);
+	const styles = window.getComputedStyle(document.body);
+	stylesheets.push({
+		name: "_discord.css",
+		disabled: false,
+		groups: [{
+			name: ":root",
+			properties: discordProperties.map(prop => {
+				prop = "--" + prop;
+				value = styles.getPropertyValue(prop);
+				if (value.includes('calc')) {
+					dummy.style.color = value;
+					value = window.getComputedStyle(dummy).color;
+				}
+				return {
+					name: prop,
+					value: value
+				}
+			})
+		}]
+	});
+	document.body.removeChild(dummy);
+	return stylesheets;
 }
 
 // Convert changes object to a css formatted string (to be injected into a style tag)

@@ -39,8 +39,10 @@ function createStylesheetNode(sheet, style) {
 		if (sheet.groups.length == 1) {
 			single = true;
 		}
-		for (i in sheet.groups) {
-			grup.appendChild(createGroupNode(sheet.groups[i], style, single));
+		for (group of sheet.groups) {
+			if (group.name == ":root") {
+				grup.appendChild(createGroupNode(group, style, true));
+			}
 		}
 	} else { // Stylesheet contains no custom properties
 		let notice = document.createElement("span");
