@@ -25,9 +25,13 @@ const discordProperties = ["header-primary", "header-secondary", "text-normal", 
 	"background-primary", "background-secondary", "background-secondary-alt", "background-tertiary", "background-floating",
 	"input-background", "background-modifier-active", "background-modifier-hover", "background-modifier-selected",
 	"background-modifier-accent", "channeltextarea-background", "background-message-hover",
-	"search-popout-option-user-username", "search-popout-option-user-nickname", "search-popout-option-non-text-color",
 	"scrollbar-thin-thumb", "scrollbar-thin-track", "scrollbar-auto-thumb", "scrollbar-auto-track",
-	"messages-scroll-thumb", "messages-scroll-track", "radio-bar-accent-color"
+	"messages-scroll-thumb", "messages-scroll-track", "radio-bar-accent-color", "search-popout-option-fade",
+	"search-popout-option-fade-hover", "search-popout-option-user-nickname", "search-popout-option-user-username",
+	"search-popout-option-filter-text", "search-popout-option-non-text-color", "search-popout-option-filter-color",
+	"search-popout-option-answer-color", "search-popout-date-picker-border", "search-popout-date-picker-hint-text",
+	"search-popout-date-picker-hint-value-text", "search-popout-date-picker-hint-value-background",
+	"search-popout-date-picker-hint-value-background-hover"
 ]
 function parseDocumentCSS() {
 	let stylesheets = [...document.styleSheets]
